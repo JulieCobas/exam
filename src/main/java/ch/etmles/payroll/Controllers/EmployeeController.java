@@ -4,6 +4,9 @@ import ch.etmles.payroll.Entities.Employee;
 import ch.etmles.payroll.Repositories.EmployeeRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -29,14 +32,22 @@ public class EmployeeController {
         -H "Content-type:application/json" ^
         -d "{\"name\": \"Russel George\", \"role\": \"gardener\"}"
     */
+
+
     @PostMapping("/employees")
     Employee newEmployee(@RequestBody Employee newEmployee){
-        return repository.save(newEmployee);
+        if(estMajeur(newEmployee)){
+            return repository.save(newEmployee);
+        }
+        else {
+            throw new EmployeeMinorsException(newEmployee.getName());
+        }
     }
 
     /* curl sample :
     curl -i localhost:8080/employees/1
     */
+
     @GetMapping("/employees/{id}")
     Employee one(@PathVariable Long id){
         return repository.findById(id)
@@ -48,19 +59,26 @@ public class EmployeeController {
         -H "Content-type:application/json" ^
         -d "{\"name\": \"Samwise Bing\", \"role\": \"peer-to-peer\"}"
      */
+
+
     @PutMapping("/employees/{id}")
     Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
-        return repository.findById(id)
-                .map(employee -> {
-                    employee.setName(newEmployee.getName());
-                    employee.setRole(newEmployee.getRole());
-                    employee.setDateOfBirth(newEmployee.getDateOfBirth());
-                    return repository.save(employee);
-                })
-                .orElseGet(() -> {
-                    newEmployee.setId(id);
-                    return repository.save(newEmployee);
-                });
+        if (estMajeur(newEmployee)) {
+            return repository.findById(id)
+                    .map(employee -> {
+                        employee.setName(newEmployee.getName());
+                        employee.setRole(newEmployee.getRole());
+                        employee.setDateOfBirth(newEmployee.getDateOfBirth());
+                        return repository.save(employee);
+                    })
+                    .orElseGet(() -> {
+                        newEmployee.setId(id);
+                        return repository.save(newEmployee);
+                    });
+        }
+        else {
+            throw new EmployeeMinorsException(newEmployee.getName());
+        }
     }
 
     /* curl sample :
@@ -69,5 +87,11 @@ public class EmployeeController {
     @DeleteMapping("/employees/{id}")
     void deleteEmployee(@PathVariable Long id){
         repository.deleteById(id);
+    }
+
+
+    public boolean estMajeur(Employee employee ){        //Vérification de l'âge si ok
+        Period age = Period.between(employee.getDateOfBirth(), LocalDate.now());
+        return age.getYears() >= 18;
     }
 }
