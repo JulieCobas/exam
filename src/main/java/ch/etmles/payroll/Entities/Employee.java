@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -13,12 +14,14 @@ public class Employee {
     @GeneratedValue Long id;
     private String name;
     private String role;
+    private String DateOfBirth;
 
     public Employee(){}
 
-    public Employee(String name, String role){
+    public Employee(String name, String role, String DateOfBirth){
         this.setName(name);
         this.setRole(role);
+        this.setDateOfBirth(DateOfBirth);
     }
 
     public Long getID(){
@@ -45,14 +48,23 @@ public class Employee {
         this.role = role;
     }
 
+    public String getDateOfBirth() {
+        return this.DateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        DateOfBirth = dateOfBirth;
+    }
     @Override
     public boolean equals(Object o){
         if(this == o)
             return true;
         if(!(o instanceof Employee employee))
             return false;
-        return Objects.equals(this.id, employee.id) && Objects.equals(this.name, employee.name)
-                && Objects.equals(this.role, employee.role);
+        return Objects.equals(this.id, employee.id)
+                && Objects.equals(this.name, employee.name)
+                && Objects.equals(this.role, employee.role)
+                && Objects.equals(this.DateOfBirth, employee.DateOfBirth);
     }
 
     @Override
@@ -62,6 +74,9 @@ public class Employee {
 
     @Override
     public String toString(){
-        return "Employee{" + "id=" + this.getID() + ", name='" + this.getName() + '\'' + ", role='" + this.getRole() + '\'' + '}';
+        return "Employee{" + "id=" + this.getID()
+                + ", name='" + this.getName() + '\''
+                + ", role='" + this.getRole() + '\''
+                + ", DateOfBirth='" + this.getDateOfBirth() + '\'' + '}';
     }
 }

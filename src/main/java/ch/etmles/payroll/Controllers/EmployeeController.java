@@ -18,6 +18,7 @@ public class EmployeeController {
     /* curl sample :
     curl -i localhost:8080/employees
     */
+
     @GetMapping("/employees")
     List<Employee> all(){
         return repository.findAll();
@@ -53,6 +54,7 @@ public class EmployeeController {
                 .map(employee -> {
                     employee.setName(newEmployee.getName());
                     employee.setRole(newEmployee.getRole());
+                    employee.setDateOfBirth(newEmployee.getDateOfBirth());
                     return repository.save(employee);
                 })
                 .orElseGet(() -> {
